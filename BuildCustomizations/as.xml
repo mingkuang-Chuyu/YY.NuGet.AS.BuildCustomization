@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ProjectSchemaDefinitions xmlns="http://schemas.microsoft.com/build/2009/properties" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+  <Rule
+    Name="AS"
+    PageTemplate="tool"
+    DisplayName="GNU/LLVM Assembler"
+    Order="200">
+    <Rule.DataSource>
+      <DataSource
+        Persistence="ProjectFile"
+        ItemType="AS" />
+    </Rule.DataSource>
+    <Rule.Categories>
+      <Category
+        Name="General">
+        <Category.DisplayName>
+          <sys:String>General</sys:String>
+        </Category.DisplayName>
+      </Category>
+      <Category
+        Name="Command Line"
+        Subtype="CommandLine">
+        <Category.DisplayName>
+          <sys:String>Command Line</sys:String>
+        </Category.DisplayName>
+      </Category>
+      <Category
+        Name="Preprocessor"
+        Subtype="Preprocessor">
+        <Category.DisplayName>
+          <sys:String>Preprocessor</sys:String>
+        </Category.DisplayName>
+      </Category>
+    </Rule.Categories>
+    <StringProperty
+      Name="Inputs"
+      Category="Command Line"
+      IsRequired="true">
+      <StringProperty.DataSource>
+        <DataSource
+          Persistence="ProjectFile"
+          ItemType="AS"
+          SourceType="Item" />
+      </StringProperty.DataSource>
+    </StringProperty>
+    <StringListProperty
+      Name="IncludePaths"
+      HelpUrl="https://docs.microsoft.com/cpp/assembler/arm/arm-assembler-command-line-reference"
+      DisplayName="Include Paths"
+      Description="Sets path for include file.     (/I dir[;dir])"
+      Switch="-I &quot;[value]&quot;" />
+    <StringProperty
+      Name="PreDefineDirective"
+      HelpUrl="https://docs.microsoft.com/cpp/assembler/arm/arm-assembler-command-line-reference"
+      DisplayName="Predefine Directive"
+      Description="SETA, SETL, or SETS directive to predefine a symbol"
+      Switch="-predefine &quot;[value]&quot;" />
+    <EnumProperty Name="WarningLevel" DisplayName="警告等级" Description="选择编译器对代码错误的严格程度。其他标志应直接添加到附加选项。(/w, /Weverything)。" Category="General" F1Keyword="VC.Project.VCClangCompilerTool.WarningLevel">
+      <EnumValue Name="TurnOffAllWarnings" Switch="w" DisplayName="关闭所有警告" Description="禁用所有编译器警告。">
+      </EnumValue>
+      <EnumValue Name="EnableAllWarnings" Switch="Wall" DisplayName="启用所有警告" Description="启用所有警告，包括默认情况下禁用的那些警告。">
+      </EnumValue>
+    </EnumProperty>
+    <BoolProperty Name="TreatWarningAsError" DisplayName="将警告视为错误" Description="将所有编译器警告视为错误。对于新项目，最好在所有编译中使用 /Werror；解决所有警告将确保最低可能的难以查找代码缺陷。" Category="General" Switch="Werror" F1Keyword="VC.Project.VCClangCompilerTool.WarnAsError">
+    </BoolProperty>
+    <EnumProperty Name="DebugInformationFormat" DisplayName="调试信息格式" Description="指定编译器生成的调试信息的类型。" Category="General" F1Keyword="VC.Project.VCClangCompilerTool.DebugInformationFormat">
+      <EnumValue Name="None" Switch="g0" DisplayName="无" Description="没有生成调试信息，因此编译可能会更快。">
+      </EnumValue>
+      <EnumValue Name="Minimal" Switch="g1" DisplayName="最小调试信息" Description="生成最小调试信息。">
+      </EnumValue>
+      <EnumValue Name="FullDebug" Switch="g2 -gdwarf-2" DisplayName="全部调试信息 (DWARF2)" Description="生成 DWARF2 调试信息。">
+      </EnumValue>
+    </EnumProperty>
+    <StringProperty
+      Name="ObjectFileName"
+      Category="Object File"
+      HelpUrl="https://msdn.microsoft.com/library/default.asp?url=/library/en-us/vcmasm/html/vclrfml.asp"
+      DisplayName="Object File Name"
+      Description="Specifies the name of the output object file."
+      Switch="-o &quot;[value]&quot;" />
+    <DynamicEnumProperty
+     Name="ASBeforeTargets"
+     Category="General"
+     EnumProvider="Targets"
+     IncludeInCommandLine="False">
+      <DynamicEnumProperty.DisplayName>
+        <sys:String>Execute Before</sys:String>
+      </DynamicEnumProperty.DisplayName>
+      <DynamicEnumProperty.Description>
+        <sys:String>Specifies the targets for the build customization to run before.</sys:String>
+      </DynamicEnumProperty.Description>
+      <DynamicEnumProperty.ProviderSettings>
+        <NameValuePair
+          Name="Exclude"
+          Value="^ASBeforeTargets|^Compute" />
+      </DynamicEnumProperty.ProviderSettings>
+      <DynamicEnumProperty.DataSource>
+        <DataSource
+          Persistence="ProjectFile"
+          ItemType=""
+          HasConfigurationCondition="true" />
+      </DynamicEnumProperty.DataSource>
+    </DynamicEnumProperty>
+    <DynamicEnumProperty
+      Name="ASAfterTargets"
+      Category="General"
+      EnumProvider="Targets"
+      IncludeInCommandLine="False">
+      <DynamicEnumProperty.DisplayName>
+        <sys:String>Execute After</sys:String>
+      </DynamicEnumProperty.DisplayName>
+      <DynamicEnumProperty.Description>
+        <sys:String>Specifies the targets for the build customization to run after.</sys:String>
+      </DynamicEnumProperty.Description>
+      <DynamicEnumProperty.ProviderSettings>
+        <NameValuePair
+          Name="Exclude"
+          Value="^ASAfterTargets|^Compute" />
+      </DynamicEnumProperty.ProviderSettings>
+      <DynamicEnumProperty.DataSource>
+        <DataSource
+          Persistence="ProjectFile"
+          ItemType=""
+          HasConfigurationCondition="true" />
+      </DynamicEnumProperty.DataSource>
+    </DynamicEnumProperty>
+    <StringProperty
+      Name="ExecutionDescription"
+      DisplayName="Execution Description"
+      IncludeInCommandLine="False"
+      Visible="False" />
+    <StringListProperty
+      Name="AdditionalDependencies"
+      DisplayName="Additional Dependencies"
+      IncludeInCommandLine="False"
+      Visible="False" />
+    <StringProperty
+      Subtype="AdditionalOptions"
+      Name="AdditionalOptions"
+      Category="Command Line">
+      <StringProperty.DisplayName>
+        <sys:String>Additional Options</sys:String>
+      </StringProperty.DisplayName>
+      <StringProperty.Description>
+        <sys:String>Additional Options</sys:String>
+      </StringProperty.Description>
+    </StringProperty>
+    <BoolProperty
+      Name="PreprocessWithCl"
+      DisplayName="Preprocess assembly source files with gcc or clang"
+      Description="Specifies whether to use gcc/clang compiler for preprocessing source files before being built with armasm assembler."
+      Category="General"
+      Visible="true"
+      HelpUrl="https://docs.microsoft.com/en-us/cpp/preprocessor/c-cpp-preprocessor-reference">
+    </BoolProperty>
+    <StringListProperty
+      Subtype="folder"
+      Name="AdditionalIncludeDirectories"
+      DisplayName="Additional Include Directories"
+      Description="Specifies one or more directories to add to the include path. Separate with ';' if more than one.     (/I[path])"
+      Category="Preprocessor"
+      Switch="I"
+      F1Keyword="VC.Project.VCCLCompilerTool.AdditionalIncludeDirectories">
+    </StringListProperty>
+    <BoolProperty
+      Name="IgnoreStandardIncludePath"
+      DisplayName="Ignore Standard Include Paths"
+      Description="Prevents the compiler from searching for include files in directories specified in the INCLUDE environment variables."
+      Category="Preprocessor"
+      Switch="X"
+      F1Keyword="VC.Project.VCCLCompilerTool.IgnoreStandardIncludePath">
+    </BoolProperty>
+    <StringListProperty
+      Name="PreprocessorDefinitions"
+      DisplayName="Preprocessor Definitions"
+      Description="Defines a preprocessing symbols for your source file."
+      Category="Preprocessor"
+      Switch="D "
+      F1Keyword="VC.Project.VCCLCompilerTool.PreprocessorDefinitions">
+    </StringListProperty>
+    <StringListProperty
+      Name="UndefinePreprocessorDefinitions"
+      DisplayName="Undefine Preprocessor Definitions"
+      Description="Specifies one or more preprocessor undefines.     (/U[macro])"
+      Category="Preprocessor"
+      Switch="U"
+      F1Keyword="VC.Project.VCCLCompilerTool.UndefinePreprocessorDefinitions">
+    </StringListProperty>
+    <BoolProperty
+      Name="UndefineAllPreprocessorDefinitions"
+      DisplayName="Undefine All Preprocessor Definitions"
+      Description="Undefine all previously defined preprocessor values.     (/u)"
+      Category="Preprocessor"
+      Switch="u"
+      F1Keyword="VC.Project.VCCLCompilerTool.UndefineAllPreprocessorDefinitions">
+    </BoolProperty>
+  </Rule>
+  <ItemType
+    Name="AS"
+    DisplayName="GNU/LLVM Assembler" />
+  <FileExtension
+    Name="*.S;*.s"
+    ContentType="AS" />
+  <ContentType
+    Name="AS"
+    DisplayName="GNU/LLVM Assembler"
+    ItemType="AS" />
+</ProjectSchemaDefinitions>

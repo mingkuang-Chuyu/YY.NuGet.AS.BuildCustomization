@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--YY MSBuild C++跨平台工具集的_AS实现。-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target
+    Name="_AS"
+    BeforeTargets="$(ASBeforeTargets)"
+    AfterTargets="$(ASAfterTargets)"
+    Condition="'@(AS)' != ''"
+    DependsOnTargets="_SelectedFiles">
+
+    <ItemGroup Condition="'@(SelectedFiles)' != ''">
+      <AS Remove="@(AS)" Condition="'%(Identity)' != '@(SelectedFiles)'" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'@(SelectedFiles)' == ''">
+      <AS Remove="@(AS)" Condition="'%(AS.ExcludedFromBuild)' == 'true'" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AS>
+        <RemoteCompileToolExe Condition="'%(AS.RemoteCompileToolExe)' == ''">$(RemoteCppCompileToolExe)</RemoteCompileToolExe>
+        <CompileAs Condition="'%(AS.PreprocessWithCl)' == 'true'">CompileAsAsmWithCpp</CompileAs>
+        <CompileAs Condition="'%(AS.PreprocessWithCl)' != 'true'">CompileAsAsm</CompileAs>         
+        <MinimalRebuildFromTracking Condition="'$(_BuildActionType)' != 'Build' or '$(ForceRebuild)' == 'true'">false</MinimalRebuildFromTracking>
+        <Sysroot>$(Sysroot)</Sysroot>
+        <TargetArch>$(ClangTarget)</TargetArch>
+        <ObjectFileName Condition="HasTrailingSlash('%(ClCompile.ObjectFileName)')">%(ClCompile.ObjectFileName)%(FileName).o</ObjectFileName>
+      </AS>
+    </ItemGroup>
+    <Compile
+        Condition="'%(AS.ExcludedFromBuild)'!='true'"
+        Sources="@(AS)"
+        AdditionalIncludeDirectories="%(AS.AdditionalIncludeDirectories);$(IncludePath)"
+        DebugInformationFormat="%(AS.DebugInformationFormat)"
+        ObjectFileName="%(AS.ObjectFileName)"
+        WarningLevel="%(AS.WarningLevel)"
+        TreatWarningAsError="%(AS.TreatWarningAsError)"
+        AdditionalWarning="%(AS.AdditionalWarning)"
+        Verbose="%(AS.Verbose)"
+        Optimization="%(AS.Optimization)"
+        WholeProgramOptimization="%(AS.WholeProgramOptimization)"
+        NoCommonBlocks="%(AS.NoCommonBlocks)"
+        PreprocessorDefinitions="%(AS.PreprocessorDefinitions)"
+        UndefinePreprocessorDefinitions="%(AS.UndefinePreprocessorDefinitions)"
+        UndefineAllPreprocessorDefinitions="%(AS.UndefineAllPreprocessorDefinitions)"
+        ShowIncludes="%(AS.ShowIncludes)"
+        PositionIndependentCode="%(AS.PositionIndependentCode)"
+        SymbolsHiddenByDefault="%(AS.SymbolsHiddenByDefault)"
+        CompileAs="%(AS.CompileAs)"
+        ForcedIncludeFiles="%(AS.ForcedIncludeFiles)"
+        AdditionalOptions="%(AS.AdditionalOptions)"
+        Sysroot="%(AS.Sysroot)"
+        TargetArch="%(AS.TargetArch)"
+        TrackerLogDirectory="$(TLogLocation)"
+        TLogReadFiles="$(TLogLocation)\compile.read.1.tlog"
+        TLogWriteFiles="$(TLogLocation)\compile.write.1.tlog"
+        TrackFileAccess ="$(TrackFileAccess)"
+        MinimalRebuildFromTracking ="%(AS.MinimalRebuildFromTracking)"
+        ToolExe="%(AS.RemoteCompileToolExe)">
+    </Compile>
+  </Target>
+</Project>

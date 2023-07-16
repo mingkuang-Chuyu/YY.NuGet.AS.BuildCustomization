@@ -1,0 +1,78 @@
+﻿name: Build
+
+on: [push]
+
+jobs:
+  Build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: 初始化
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: |
+          # 默认值，便于生成临时开发版
+          $version='100.0.0-alpha'
+          $releaseNotes='内部预览版'
+
+          if($env:GITHUB_REF.StartsWith("refs/tags/v", "CurrentCultureIgnoreCase"))
+          {
+              $version = $env:GITHUB_REF.Remove(0, 11);
+              
+
+              # github的内置版本有Bug，此行必须添加，否则无法获得内容
+              git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+              $releaseNotes = & git tag -l --format='%(contents)' $env:GITHUB_REF.Remove(0, 10)
+          }
+          echo "version=$version" >> $env:GITHUB_ENV
+          echo "releaseNotes=$releaseNotes" >> $env:GITHUB_ENV
+
+          $metadata = '-p "releaseNotes=' + $releaseNotes + '"'
+          $metadata += ' -p "version=' + $version + '"'
+          $metadata += ' -p "commit=' + $env:GITHUB_SHA + '"'
+
+          # 生成响应文件， 因为releaseNotes的内容往往比较复杂，命令行无法无法容纳。
+          [System.IO.File]::WriteAllText("metadata.txt", $metadata, [System.Text.Encoding]::UTF8)
+    - name: 文件打包
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: |
+          # 打包Release，给非NuGet用户本地使用
+          &7z a -tzip YY.BuildCustomization.AS-${{env.version}}.zip BuildCustomizations LICENSE
+          if($lastexitcode -ne 0)
+          {
+              throw "nuget pack失败！退出代码：$lastexitcode"
+          }
+
+          # 打包Nuget
+          &nuget pack NuGet\YY.NuGet.BuildCustomization.AS.nuspec "@metadata.txt"
+          if($lastexitcode -ne 0)
+          {
+              throw "nuget pack失败！退出代码：$lastexitcode"
+          }
+    - uses: actions/upload-artifact@v2
+      if: success() || failure()
+      with:
+        path: |
+            *.nupkg
+            *.zip
+            metadata.txt
+
+    - uses: xresloader/upload-to-github-release@v1
+      if: contains(github.ref, 'tags/')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "*.zip"
+        overwrite: true
+        tags: true
+        draft: false
+
+    - name: 内容发布
+      if: contains(github.ref, 'tags/')
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: |
+         # 把生成的nuget包发布到nuget中
+         &nuget push YY.NuGet.BuildCustomization.AS.${{env.version}}.nupkg -ApiKey ${{ secrets.NUGET_TOKEN }} -Source https://api.nuget.org/v3/index.json
+

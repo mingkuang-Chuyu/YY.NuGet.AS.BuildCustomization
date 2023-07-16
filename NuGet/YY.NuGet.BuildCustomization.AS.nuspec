@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/01/nuspec.xsd">
+  <metadata minClientVersion="2.5">
+    <id>YY.NuGet.BuildCustomization.AS</id>
+    <version>$version$</version>
+    <title>适用于gcc/clang的汇编工具</title>
+    <summary>适用于gcc/clang的汇编工具。</summary>
+    <authors>YY</authors>
+    <owners>mingkuang</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/mingkuang-Chuyu/YY.NuGet.BuildCustomization.AS</projectUrl>
+    <description>
+        适用于gcc/clang的汇编工具。
+    </description>
+    <releaseNotes>$releaseNotes$</releaseNotes>
+    <copyright>Copyright© mingkuang</copyright>
+    <tags>mingkuang YY native nativepackage</tags>
+    <repository type="git" url="https://github.com/mingkuang-Chuyu/YY.NuGet.BuildCustomization.AS.git" branch="main" commit="$commit$" />
+    <dependencies>
+      <dependency id="YY.NuGet.Import.Helper" version="1.0.0.4" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src=".\YY.NuGet.BuildCustomization.AS.props" target="build\native\YY.NuGet.BuildCustomization.AS.props"/>
+    <file src="..\BuildCustomizations\as.targets" target="build\native\YY.NuGet.BuildCustomization.AS.targets"/>
+    <file src="..\BuildCustomizations\**" target="build\native\" exclude="..\BuildCustomizations\as.targets"/>
+  </files>
+</package>

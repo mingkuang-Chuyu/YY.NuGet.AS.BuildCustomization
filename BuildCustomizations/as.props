@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup
+    Condition="'$(ASBeforeTargets)' == '' and '$(ASAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <ASBeforeTargets>Midl</ASBeforeTargets>
+    <ASAfterTargets>CustomBuild</ASAfterTargets>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <AS>
+      <PreprocessWithCl Condition="'%(PreprocessWithCl)' == ''">true</PreprocessWithCl>
+      <ObjectFileName Condition="'%(ObjectFileName)' == ''">$(IntDir)%(FileName).o</ObjectFileName>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+    </AS>
+  </ItemDefinitionGroup>
+</Project>

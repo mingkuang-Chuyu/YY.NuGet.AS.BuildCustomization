@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--微软 MSBuild C++ Linux工具集的_AS实现。-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target
+    Name="_AS"
+    BeforeTargets="$(ASBeforeTargets)"
+    AfterTargets="$(ASAfterTargets)"
+    Condition="'@(AS)' != ''"
+    DependsOnTargets="_SelectedFiles;_CopySources;ResolveRemoteDir">
+
+    <ItemGroup Condition="'@(SelectedFiles)' != ''">
+      <AS Remove="@(AS)" Condition="'%(Identity)' != '@(SelectedFiles)'" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'@(SelectedFiles)' == ''">
+      <AS Remove="@(AS)" Condition="'%(AS.ExcludedFromBuild)' == 'true'" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AS>
+        <RemoteCompileToolExe Condition="'%(AS.RemoteCompileToolExe)' == ''">$(RemoteCppCompileToolExe)</RemoteCompileToolExe>
+        <CompileAs>Default</CompileAs>
+      </AS>
+    </ItemGroup>
+
+    <GetOutOfDateItems
+      Condition="'@(SelectedFiles)' == '' and '@(AS)' != '' and '$(TrackFileAccess)' == 'true'"
+      Sources="@(AS)"
+
+      OutputsMetadataName="ObjectFileName"
+      CommandMetadataName="ActualCommandLine"
+
+      TLogDirectory="$(TLogLocation)"
+      TLogNamePrefix="AS"
+      TrackFileAccess="$(TrackFileAccess)"
+      >
+      <Output TaskParameter="OutOfDateSources" ItemName="_AS"/>
+    </GetOutOfDateItems>
+
+    <ItemGroup Condition ="'$(SelectedFiles)' != '' or '$(TrackFileAccess)' != 'true'">
+      <_AS Include="@(AS)" />
+    </ItemGroup>
+
+    <Message
+      Importance="High"
+      Text="%(_AS.FileName)" />
+    
+    <ItemGroup Condition="'@(_AS)' != ''">
+      <_Preprocess Include="@(_AS)" Condition="'%(_AS.PreprocessWithCl)' == 'true'" />
+        <_AS Remove="@(_Preprocess)"  />
+    </ItemGroup>
+      
+    <MultiMakeCl
+      Condition="'@(_Preprocess)' != ''"
+      Sources="@(_Preprocess)"
+      ProjectDir="$(ProjectDir)"
+      RemoteProjectDir="$(_ResolvedRemoteProjectDir)"
+      IntermediateDir="$(IntDir)"
+      OutputDir ="$(OutDir)"
+      RemoteOutputDir="$(_ResolvedRemoteOutputDir)"
+      RemoteIntermediateDir="$(_ResolvedRemoteIntermediateDir)"
+      RemoteTarget="$(ResolvedRemoteTarget)"
+      ImportedProjects="$(MSBuildAllProjects)"
+      IncludePath="$(IncludePath)">
+      <Output TaskParameter="RemoteClCompile" ItemName="RemoteASPreprocess"/>     
+    </MultiMakeCl>
+    <MultiMakeCl
+      Condition="'@(_AS)' != ''"
+      Sources="@(_AS)"
+      ProjectDir="$(ProjectDir)"
+      RemoteProjectDir="$(_ResolvedRemoteProjectDir)"
+      IntermediateDir="$(IntDir)"
+      OutputDir ="$(OutDir)"
+      RemoteOutputDir="$(_ResolvedRemoteOutputDir)"
+      RemoteIntermediateDir="$(_ResolvedRemoteIntermediateDir)"
+      RemoteTarget="$(ResolvedRemoteTarget)"
+      ImportedProjects="$(MSBuildAllProjects)"
+      IncludePath="$(IncludePath)">
+      <Output TaskParameter="RemoteClCompile" ItemName="RemoteAS"/>     
+    </MultiMakeCl>
+      
+    <ItemGroup>
+      <RemoteASPreprocess>
+        <CommandLine>$([System.String]::Copy('%(RemoteASPreprocess.CommandLine)').Insert(2, ' -x assembler-with-cpp'))</CommandLine>
+      </RemoteASPreprocess>
+      <RemoteAS>
+        <CommandLine>$([System.String]::Copy('%(RemoteAS.CommandLine)').Insert(2, ' -x assembler'))</CommandLine>
+      </RemoteAS>
+      <RemoteAS Include="@(RemoteASPreprocess)" />
+      <RemoteASPreprocess Remove="@(RemoteASPreprocess)"/>
+    </ItemGroup>
+      
+    <Compile Condition="'@(RemoteAS)' != ''"
+      ProjectDir="$(ProjectDir)"
+      RemoteProjectDir="$(_ResolvedRemoteProjectDir)"
+      IntermediateDir="$(IntDir)"
+      OutputDir ="$(OutDir)"
+      RemoteOutputDir="$(_ResolvedRemoteOutputDir)"
+      RemoteIntermediateDir="$(_ResolvedRemoteIntermediateDir)"
+      RemoteTarget="$(ResolvedRemoteTarget)"
+      RemoteClCompile="@(RemoteAS)"
+      ClInclude="@(ClInclude)"
+      UpToDateFile="$(CompileUpToDateFile)"
+      Timeout="$(RemoteCompileCommandTimeout)"
+      CopyObjectFiles="$(RemoteCompileLocalCopyObjectFiles)"
+      MultiProcBuild="$(MultiProcBuild)"
+      MultiProcNumber="$(MultiProcNumber)">
+        <Output TaskParameter="RemoteLink" ItemName="RemoteLink"/>
+        <Output TaskParameter="IsCompileUpToDate" PropertyName="IsCompileUpToDate"/>
+      </Compile>
+
+      <WriteLinesToFile Overwrite="true" Encoding="Unicode" File="$(TLogLocation)\AS.read.1.tlog" Lines="@(RemoteAS->'^%(Fullpath)');@(ClInclude->'^%(fullpath)')" />
+
+      <!-- The following new line is intentional. -->
+      <WriteLinesToFile Overwrite="true" Encoding="Unicode" File="$(TLogLocation)\AS.write.1.tlog" Lines="@(RemoteAS->'^%(Fullpath)
+$(CompileUpToDateFile)')" />
+    <ItemGroup>
+      <_AS Remove="@(_AS)" />
+    </ItemGroup>
+  </Target>
+</Project>

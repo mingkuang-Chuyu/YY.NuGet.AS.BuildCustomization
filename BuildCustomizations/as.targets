@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <PropertyPageSchema
+      Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml" />
+      <AvailableItemName Include="AS">
+        <Targets>_AS</Targets>
+      </AvailableItemName>
+  </ItemGroup>
+  <PropertyGroup>
+    <ComputeLinkInputsTargets>
+      $(ComputeLinkInputsTargets);
+      ComputeASOutput;
+    </ComputeLinkInputsTargets>
+    <ComputeLibInputsTargets>
+      $(ComputeLibInputsTargets);
+      ComputeASOutput;
+    </ComputeLibInputsTargets>
+  </PropertyGroup>
+  <ImportGroup>
+    <Import Project="$(MSBuildThisFileDirectory)as-yy.targets_" Condition="'$(__IsYYLinuxCross)' == 'true'" />
+    <Import Project="$(MSBuildThisFileDirectory)as-ms.targets_" Condition="'$(__IsYYLinuxCross)' != 'true'" />
+  </ImportGroup>
+  <Target
+    Name="ComputeASOutput"
+    Condition="'@(AS)' != ''">
+    <ItemGroup>
+      <Link Include="@(AS->Metadata('ObjectFileName')->Distinct()->ClearMetadata())" Condition="'%(AS.ExcludedFromBuild)' != 'true'"/>
+      <Lib Include="@(AS->Metadata('ObjectFileName')->Distinct()->ClearMetadata())" Condition="'%(AS.ExcludedFromBuild)' != 'true'"/>
+    </ItemGroup>
+  </Target>
+  <Target
+    Name="ComputeASObj"
+    Condition="'@(AS)' != ''"
+    BeforeTargets="GetResolvedLinkObjs">
+    <ItemGroup>
+      <Obj Include="@(AS->Metadata('ObjectFileName')->Distinct()->ClearMetadata())" Condition="'%(AS.ExcludedFromBuild)' != 'true'"/>
+    </ItemGroup>
+  </Target>
+</Project>
