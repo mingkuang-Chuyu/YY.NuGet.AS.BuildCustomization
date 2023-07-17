@@ -23,7 +23,7 @@
   </metadata>
   <files>
     <file src=".\YY.NuGet.BuildCustomization.AS.props" target="build\native\YY.NuGet.BuildCustomization.AS.props"/>
-    <file src="..\BuildCustomizations\as.targets" target="build\native\YY.NuGet.BuildCustomization.AS.targets"/>
-    <file src="..\BuildCustomizations\**" target="build\native\" exclude="..\BuildCustomizations\as.targets"/>
+    <file src=".\YY.NuGet.BuildCustomization.AS.targets" target="build\native\YY.NuGet.BuildCustomization.AS.targets"/>
+    <file src="..\BuildCustomizations\**" target="build\native\"/>
   </files>
 </package>
